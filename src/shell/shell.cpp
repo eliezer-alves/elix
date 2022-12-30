@@ -1,23 +1,24 @@
 #include <Arduino.h>
 #include <string.h>
+
 #include "../../include/shell/shell.h"
 #include "../../include/io/serial.h"
 #include "../../include/common/common.h"
+
 #include "commands/version.c"
+#include "commands/clear.c"
 
 const int MAX_TOKENS = 10;
 const char *DELIMITER = " ";
 char MESSAGE_INIT[] = "$ init Shell\n",
      DEFAULT_MESSAGE[] = "$ ",
-     UNKNOWN_COMMAND_MESSAGE[] = "unknown command",
-     LINE_BREAK[] = "\n";
+     UNKNOWN_COMMAND_MESSAGE[] = "unknown command";
 
-void print(char *buff);
 int handleInput(char *input, char *tokens[]);
 
 void shell_init()
 {
-  serial_print(MESSAGE_INIT);
+  serial_println(MESSAGE_INIT);
 }
 
 void shell(char *input)
@@ -25,23 +26,21 @@ void shell(char *input)
   char *tokens[10];
   int tokens_size = handleInput(input, tokens);
   char *command = tokens[0];
-  print(command);
+  serial_print("-> ");
+  serial_println(command);
 
   if (strcmp(tokens[0], "version") == 0)
   {
     version();
-    serial_print(LINE_BREAK);
+  }
+  else if (strcmp(tokens[0], "clear") == 0)
+  {
+    clear();
   }
   else
   {
-    print(UNKNOWN_COMMAND_MESSAGE);
+    serial_println(UNKNOWN_COMMAND_MESSAGE);
   }
-}
-
-void print(char *buff)
-{
-  serial_print(strcat(DEFAULT_MESSAGE, buff));
-  serial_print(LINE_BREAK);
 }
 
 int handleInput(char *input, char *tokens[])

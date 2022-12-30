@@ -3,6 +3,5 @@
 
 void version()
 {
-  char version_str[] = VERSION_STR;
-  serial_print(version_str);
+  serial_println(VERSION_STR);
 }
