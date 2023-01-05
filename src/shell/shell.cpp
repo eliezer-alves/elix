@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <string.h>
+#include <time.h>
 
 #include "../../include/shell/shell.h"
 #include "../../include/io/serial.h"
@@ -15,15 +16,22 @@ char DEFAULT_MESSAGE[] = "> ",
      UNKNOWN_COMMAND_MESSAGE[] = "unknown command";
 
 int handleInput(char *input, char *buffer[], char *args[], char *command);
+void toDate(unsigned long timestamp, char *date);
 
 void shell_init()
 {
   serial_println(DEFAULT_MESSAGE);
 }
 
-void shell(char *input)
+void shell(char *input, volatile unsigned long clock_count)
 {
+  char date[20];
+  toDate(clock_count, date);
+
   serial_println("");
+  serial_print("[");
+  serial_print(date);
+  serial_print("] ");
   serial_print(DEFAULT_MESSAGE);
   serial_println(input);
 
@@ -70,4 +78,12 @@ int handleInput(char *input, char *buffer[], char *args[], char *command)
   strcpy(command, buffer[0]);
 
   return i;
+}
+
+void toDate(unsigned long timestamp, char *date) {
+  time_t t = (time_t)timestamp;  // Converte o timestamp para o tipo time_t
+  struct tm *tm = localtime(&t);  // Obtém a estrutura tm com a data e hora correntes
+
+  // Gera a string no formato "d/m/Y H:m:s" usando a estrutura tm
+  sprintf(date, "%d/%d/%d %02d:%02d:%02d", tm->tm_mday, tm->tm_mon + 1, tm->tm_year + 1900, tm->tm_hour, tm->tm_min, tm->tm_sec);
 }
